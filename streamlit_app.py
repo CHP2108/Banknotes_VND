@@ -8,8 +8,9 @@ import base64
 
 menu=['Home','Play game','Obb or Even']
 money=None
+st.sidebar.image('casino_pos.gif')
 choice = st.sidebar.selectbox('HY CASINO MENU:', menu)
-main_bg = "Media/1190722.jpg"
+main_bg = "moneyback.jpeg"
 main_bg_ext = "jpg"
 
 side_bg = "Media/ab.jpg"
@@ -27,28 +28,39 @@ f"""
 </style>
 """,
 unsafe_allow_html=True)
-st.audio('Media\musiz.mp3',format="audio/wav",start_time=35)
+st.audio('Media/musiz.mp3',format="audio/wav",start_time=35)
 #Load your model and check create the class_names list
-Model_Path = 'Model\Result\model_ckpt.h5'
+Model_Path = 'model_save.h5'
 class_names = [1000, 10000, 100000, 2000, 20000, 200000, 5000, 50000, 500000]
 model = tf.keras.models.load_model(Model_Path)
+        # Initialization
+if 'money' not in st.session_state:
+    st.session_state['money'] = 0
 if choice =='Home':
+    st.image('panda_girl.gif')  
+    st.header("ENJOY THE CASINO NIGHT!")
     
+    st.header('  ')
+    st.code('feeling bored so I am going to the casino today!')
     
 
     name = st.text_input("What's your name?")
     if name:
         st.header('Hello ' + name )
+        st.title("Ladies and Gentlement!")
         st.title("Welcome to HY Casino!")
+        st.slider('How excited are you?')
         st.header("Do you want to play a game?")
         col1, col2 = st.columns(2)
         with col1:
             c1=st.button('Yes')
+            
         with col2:
             c2=st.button('Very Yes')
         if (c1==True or c2==True):
             st.write('Please go to play game page')  
 elif choice == 'Play game':
+    st.image('giphy_betmoney.gif')
     st.title("How much money you want to bet?")
     cap = cv2.VideoCapture(0)  # device 0
     run = st.checkbox('Show Webcam')
@@ -85,26 +97,32 @@ elif choice == 'Play game':
         # st.write(img_array)
         prediction = model.predict(img_array)
         index=prediction[0].argmax()
-        st.write(f'You bet {class_names[index]}  VND to play "Obb or Even"')
+        st.write(prediction[0].max())
+        if prediction[0].max() >= 0.6:
+            st.write(f'You bet {class_names[index]}  VND to play "Obb or Even"')
+        else:
+            st.write("Something wrong!!!")
         money =class_names[index]
-        # Initialization
-        if 'key' not in st.session_state:
-            st.session_state['money'] = class_names[index]
+        st.session_state['money'] = class_names[index]
         
 else: 
+        st.image('mel-gibson-stupid.gif')
         money=st.session_state['money']
-        choiz = st.radio("Obb or Even?",['Stop','Obb','Even'])
-        if choiz=='Obb':
+        st.header('ODD OR EVEN?')
+        choiz = st.radio("Do it! Do it now! Don't wait!!!!!!!!!!!!!",['Stop','Odd','Even'])
+        if choiz=='Odd':
             with st.spinner("Training ongoing"):
                 number = np.random.random_integers(100)
                 st.header(number)
                 if number%2==0:
                     result='Even'
                 else:
-                    result='Obb'
+                    result='Odd'
                 if choiz==result:
+                    st.write('Congratulations! You win!')
                     st.balloons()
                     st.session_state['money']*=2
+                    
                     choiz='Stop'
                 else: 
                     st.session_state['money']=0
@@ -117,7 +135,7 @@ else:
                 if number%2==0:
                     result='Even'
                 else:
-                    result='Obb'
+                    result='Odd'
                 if choiz==result:
                     st.balloons()
                     st.session_state['money']*=2
@@ -128,18 +146,3 @@ else:
                     pl=False       
         st.write('You have: ',st.session_state['money'])  
         
-#     image_upload = st.file_uploader("Upload Files",type=['png','jpeg','jpg'])
-#     st.image(image_upload)
-#     if image_upload !=None:
-#         image_upload = cv2.resize(image_upload,(299,299))
-#         #Expand dim to make sure your img_array is (1, Height, Width , Channel ) before plugging into the model
-#         img_array  = np.expand_dims(image_upload, axis=0)
-#         #Check the img_array here
-#         # st.write(img_array)
-#         prediction = model.predict(img_array)
-#         index=prediction[0].argmax()
-#         st.write(index)
-#         st.write(class_names[index])
-        
-        # Preprocess your prediction , How are we going to get the label name out from the prediction
-        # Now it's your turn to solve the rest of the code
